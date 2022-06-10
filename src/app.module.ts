@@ -6,9 +6,8 @@ import { OrderItemModule } from './order-item/order-item.module';
 import { MovieModule } from './movie/movie.module';
 import { CommonModule } from './common/common.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { User } from './user/schemas/user.schema';
 
 
 

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, Get, HttpCode, NotFoundException, Param, Post, Req, Res, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Res } from '@nestjs/common';
 import {CreateUserDto} from './dto/create.user.dto';
 import { User } from './schemas/user.schema';
 import { UserService } from './user.service';
@@ -35,16 +35,17 @@ export class UserController {
 
 			subscibeEndDate: null,
 		});
-		user.profile.save(profile);
-		await user.save();
+		//user.profile.save(profile);
+		//await user.save();
 		return user;
 	}
 
 	@Get('')
-	getAll():Promise<User[]>{
-		return this.userService.getAll();
+	async getAll():Promise<User[]>{
+		return await this.userService.getAll();
 	}
 
+	
 	@Get(':id')
 	getOne(@Param('id') id: string):Promise<User>{
 		return this.userService.getOne({ id });
@@ -54,17 +55,17 @@ export class UserController {
 	deletetOne(@Res() res: Response, @Param('id') _id: string) {
 		
 		const user = this.userService.getOne({ _id });
-		console.log(user)
-		if(!user){throw new NotFoundException("Пользователь не найден")}
+		console.log(user);
+		if(!user){throw new NotFoundException('Пользователь не найден');}
 		try {
 			const result = this.userService.deleteOne({_id});
-			console.log(result)
+			console.log(result);
 		} catch (error) {
-			throw new BadRequestException("Ошибка удаления")
+			throw new BadRequestException('Ошибка удаления');
 		}
 		
 		return res.status(200).send({
 			message: `Пользователь с id: ${_id} успешно удалён`
-		})
+		});
 	}
 }

@@ -1,8 +1,6 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
 import { Date, Document } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
 
 export type ProfileDocument = Profile & Document;
 

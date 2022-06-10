@@ -13,13 +13,13 @@ export class ProfileService {
 
 	}
 	async create(createProfileDto: CreateProfileDto){
-		return await this.profileModel.create(
+		return this.profileModel.create(
 			{
 				...createProfileDto,
 				createdAt: Date.now(),
 				updatedAt: Date.now(),
 			}
-		)
+		);
 		
 	}
 }

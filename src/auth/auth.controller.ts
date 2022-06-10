@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Get, NotFoundException, Post, Req, Res, UnauthorizedException, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { UserService } from 'src/user/user.service';
@@ -23,7 +23,7 @@ export class AuthController {
 		
 		const id = await this.authService.userId(req);
 		
-		return await this.userService.getOneWithPassword({id});
+		return this.userService.getOneWithPassword({id});
 
 	}
 
@@ -31,17 +31,17 @@ export class AuthController {
 	async login(@Body() body: LoginUserDto, @Res({ passthrough: true }) res: Response) {
 		
 		const {email, password} = body;
-		const user = await this.userService.getOneWithPassword({email})
+		const user = await this.userService.getOneWithPassword({email});
 		
 		if(!user){
-			throw new UnauthorizedException("Не верный логин или пароль")
+			throw new UnauthorizedException('Не верный логин или пароль');
 		}
 
 		if (user.password===undefined || !await bcrypt.compare(password, user.password)){
-			throw new UnauthorizedException("Не верный логин или пароль")
+			throw new UnauthorizedException('Не верный логин или пароль');
 		}
 		if(!user.isVerified){
-			throw new UnauthorizedException("Вашь акканту не активный, пройдите процедуру потверждения email")
+			throw new UnauthorizedException('Вашь акканту не активный, пройдите процедуру потверждения email');
 		}
 
 		const jwt = await this.jwtService.signAsync({ 
@@ -49,7 +49,7 @@ export class AuthController {
 			first_name: user.first_name, 
 			email: user.email });
 
-		res.cookie('jwt', jwt, { httpOnly: true })
+		res.cookie('jwt', jwt, { httpOnly: true });
 
 		return user;
 	}
@@ -57,9 +57,9 @@ export class AuthController {
 	@Post('register')
 	async register (@Body() dto: RegisterUserDto ){
 		let { email, password } = dto;
-		const user = await this.userService.getOne({ email })
+		const user = await this.userService.getOne({ email });
 		if (user) {
-			throw new BadRequestException('email уже используеться')
+			throw new BadRequestException('email уже используеться');
 		}
 		password = await bcrypt.hash(dto.password, 12);
 		return this.userService.create({ ...dto, password });
@@ -68,7 +68,7 @@ export class AuthController {
 	@Post('logout')
 	async logout (@Res() res: Response){
 		res.clearCookie('jwt');
-		return res.status(200).send({message:'Logout success'})
+		return res.status(200).send({message:'Logout success'});
 	}
 
 
