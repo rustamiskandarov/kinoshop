@@ -1,17 +1,19 @@
+import { Types } from "mongoose";
 
 export class CreateProfileDto{
 	
-	brithDay?: Date;
+	readonly brithDay?: Date;
 	
-	avatars?: string[];
+	readonly avatars?: string[];
 
-	preferences?: string[];
+	readonly preferences?: string[];
 
-	isVerified?: boolean;
+	readonly isVerified?: boolean;
 	
-	isActive?: boolean;
+	readonly isActive?: boolean;
 
-	subscibeStartDate?: Date;
+	readonly subscibeStartDate?: Date;
 
-	subscibeEndDate?: Date;
+	readonly subscibeEndDate?: Date;
+
 }

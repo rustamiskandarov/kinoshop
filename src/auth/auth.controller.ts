@@ -1,24 +1,28 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcryptjs';
-import LoginUserDto from './dto/login.user.dto';
-import RegisterUserDto from './dto/register.user.dto';
-import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
+import LoginUserDto from 'src/auth/dto/login.user.dto';
+import RegisterUserDto from 'src/auth/dto/register.user.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { ProfileService } from 'src/profile/profile.service';
+import { User } from 'src/user/schemas/user.schema';
 
 //@UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
 	constructor(
 		private readonly userService: UserService,
+		private readonly profileService: ProfileService,
 		private readonly authService: AuthService,
 		private readonly jwtService: JwtService,
 		){}
 		
 	@UseGuards(AuthGuard)
 	@Get('info')
+	@HttpCode(200)
 	async getPrivateOwnerInfo(@Req() req: Request){
 		
 		const id = await this.authService.userId(req);
@@ -28,18 +32,16 @@ export class AuthController {
 	}
 
 	@Post('login')
+	@HttpCode(200)
 	async login(@Body() body: LoginUserDto, @Res({ passthrough: true }) res: Response) {
 		
 		const {email, password} = body;
 		const user = await this.userService.getOneWithPassword({email});
 		
-		if(!user){
+		if(!user || !this.isValidPassword(user, password)){
 			throw new UnauthorizedException('Не верный логин или пароль');
 		}
 
-		if (user.password===undefined || !await bcrypt.compare(password, user.password)){
-			throw new UnauthorizedException('Не верный логин или пароль');
-		}
 		if(!user.isVerified){
 			throw new UnauthorizedException('Вашь акканту не активный, пройдите процедуру потверждения email');
 		}
@@ -53,7 +55,7 @@ export class AuthController {
 
 		return user;
 	}
-
+	@HttpCode(200)
 	@Post('register')
 	async register (@Body() dto: RegisterUserDto ){
 		let { email, password } = dto;
@@ -62,7 +64,21 @@ export class AuthController {
 			throw new BadRequestException('email уже используеться');
 		}
 		password = await bcrypt.hash(dto.password, 12);
-		return this.userService.create({ ...dto, password });
+		
+		const profile = await this.profileService.create({
+			brithDay: null,
+			avatars: [],
+			preferences: [],
+			isVerified: false,
+			isActive: false,
+			subscibeStartDate: null,
+			subscibeEndDate: null,
+		});
+		const newUser = await this.userService.create({ ...dto, password });
+		newUser.profile = profile;
+		profile.save();
+		newUser.save();
+		return await this.userService.getOne({ email });
 	}
 
 	@Post('logout')
@@ -72,5 +88,8 @@ export class AuthController {
 	}
 
 
+	private async isValidPassword(user: User, password: string): Promise<boolean>{
+		return user.password === undefined || !await bcrypt.compare(password, user.password);
+	}
 
 }

@@ -4,13 +4,16 @@ import { CommonModule } from 'src/common/common.module';
 import { User, UserSchema } from 'src/user/schemas/user.schema';
 import { Profile, ProfileSchema } from './schemas/profile.schema';
 import { ProfileService } from './profile.service';
+import { ProfileController } from './profile.controller';
 
 @Module({
-	imports: [CommonModule,
+	imports: [
+		CommonModule,
 		MongooseModule.forFeature([{ name: Profile.name, schema: ProfileSchema }]),
 		MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
 	],
 	providers: [ProfileService],
-	exports: [ProfileModule]
+	exports: [ProfileModule],
+	controllers: [ProfileController]
 })
 export class ProfileModule {}

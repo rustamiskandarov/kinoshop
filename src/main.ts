@@ -1,9 +1,10 @@
 //require('dotenv').config({ path: `../local.env` });
 //require('dotenv').config({ path: `../${process.env.NODE_ENV}.env` });
 import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);

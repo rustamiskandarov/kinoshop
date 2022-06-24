@@ -6,8 +6,9 @@ import { OrderItemModule } from './order-item/order-item.module';
 import { MovieModule } from './movie/movie.module';
 import { CommonModule } from './common/common.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { getMongoConfig } from './config/mongo.config';
 
 
 
@@ -20,10 +21,9 @@ import { AuthModule } from './auth/auth.module';
 		// 	useNewUrlParser: true}
 		// ),
 		MongooseModule.forRootAsync({
-			useFactory:()=>({
-				uri: `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@localhost:${process.env.MONGO_HOST}?retryWrites=true&w=majority`,
-
-			})
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: getMongoConfig
 		}),
 		
 		// MongooseModule.forRootAsync({
@@ -40,3 +40,4 @@ import { AuthModule } from './auth/auth.module';
 	providers: [],
 })
 export class AppModule { }
+

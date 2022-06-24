@@ -12,14 +12,16 @@ export class ProfileService {
 	){
 
 	}
-	async create(createProfileDto: CreateProfileDto){
+	async create(createProfileDto){
 		return this.profileModel.create(
 			{
 				...createProfileDto,
-				createdAt: Date.now(),
-				updatedAt: Date.now(),
 			}
 		);
 		
+	}
+
+	async findAll(){
+		return this.profileModel.find().exec();
 	}
 }

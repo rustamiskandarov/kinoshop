@@ -1,47 +1,48 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, Document } from 'mongoose';
+import { Transform } from 'class-transformer';
+import { Date, Document, Types } from 'mongoose';
 
 export type ProfileDocument = Profile & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Profile {
-
+	@Transform(({ value }) => value.toString())
 	_id: string;
 
-	// @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-	// user: User;
+	@Prop()
+	userId: Types.ObjectId;
 
 	// @Prop()
 	// favorites: Movie;
 
-	@Prop({type: Date})
+	@Prop({ type: Date })
 	brithDay: Date;
 
-	@Prop()
+	@Prop({ type: () => [String] })
 	avatars: string[];
 
-	@Prop()
+	@Prop({ type: () => [String] })
 	preferences: string[];
 
 	@Prop({ default: true })
 	isVerified: boolean;
 
-	@Prop({ default: true})
+	@Prop({ default: true })
 	isActive: boolean;
 
 	@Prop({ type: Date })
 	subscibeStartDate: Date;
-	
+
 	@Prop({ type: Date })
 	subscibeEndDate: Date;
 
-	@Prop({ type: Date })
-	createdAt: Date;
+	// @Prop({ type: Date, default: Date.now })
+	// createdAt: Date;
 
-	@Prop({ type: Date })
-	updatedAt: Date;
-	
+	// @Prop({ type: Date, default: Date.now })
+	// updatedAt: Date;
+
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
